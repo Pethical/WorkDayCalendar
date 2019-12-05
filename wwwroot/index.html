@@ -1,0 +1,297 @@
+﻿<!doctype html>
+<html lang="hu">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet"
+          href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/styles/default.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/highlight.min.js"></script>
+    <title>Holiday Calendar!</title>
+</head>
+<body>
+    <div class="container pt-5">
+        <div class="row">
+            <div class="col-md-6 mt-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Dátumtól számított munkanapok</h5>
+                        <small class="text-muted">Negatív számot is megadhatsz</small>
+                        <hr />
+                        <div class="row">
+                            <div class="form-group col-lg-6">
+                                <input autocomplete="off" data-type="date" type="text" id="date" placeholder="Válassz dátumot" />
+                            </div>
+                            <div class="form-group col-lg-6">
+                                <input autocomplete="off" class="gj-textbox-md" type="text" id="workdays" placeholder="Munkanapok száma" />
+                            </div>
+                            <div class="mt-3 form-group col-12 text-right">
+                                <button id="b1" class="btn btn-info btn-block">Mutasd!</button>
+                            </div>
+                            <div class="col-12 text-center">
+                                <h5>
+                                    <span id="result">
+                                        &nbsp;
+                                    </span>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mt-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Két dátum közötti munkanapok</h5>
+                        <small class="text-muted">Válassz ki a két dátumot</small>
+                        <hr />
+                        <div class="row">
+                            <div class="form-group col-lg-6">
+                                <input autocomplete="off" type="text" data-type="date" id="date1" placeholder="Válassz dátumot" />
+                            </div>
+                            <div class="form-group col-lg-6">
+                                <input autocomplete="off" type="text" data-type="date" id="date2" placeholder="Válassz másik dátumot" />
+                            </div>
+                            <div class="mt-3 form-group col-12 text-right">
+                                <button id="b2" class="btn btn-info btn-block">Mutasd!</button>
+                            </div>
+                            <div class="col-12 text-center">
+                                <h5>
+                                    <span id="result2">
+                                        &nbsp;
+                                    </span>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-lg-6">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Különleges nap módosítása</h5>
+                        <small class="text-muted">Válassz ki egy dátumot és egy típust</small>
+                        <hr />
+                        <div class="row">
+                            <div class="form-group col-lg-6">
+                                <input autocomplete="off" type="text" data-type="date" id="extraday" placeholder="Válassz dátumot" />
+                            </div>
+                            <div class="form-group col-lg-6">
+                                <select id="dayType" class="form-control">
+                                    <option value="ExtraWorkDay">Rendkívüli munkanap</option>
+                                    <option value="ExtraFreeDay">Rendkívüli szabadnap</option>
+                                    <option value="LocalHoliday">Nemzeti ünnep</option>
+                                    <option value="delete">Nap törlése</option>
+                                </select>
+                            </div>
+                            <div class="mt-3 form-group col-12 text-right">
+                                <button id="b3" class="btn btn-info btn-block">Mentés!</button>
+                            </div>
+                            <div class="col-12 text-center">
+                                <h5>
+                                    <span id="result2">
+                                        &nbsp;
+                                    </span>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Dokumentáció és OpenAPI definíció</h5>
+                        <small class="text-muted">Hogy szolgáltatásként is tudd használni...</small>
+                        <hr />
+                        <a class="btn-outline-info btn-block btn" href="/docs/index.html" target="_blank">OpenApi dokumentáció megnyitás</a>
+                        <a class="btn-outline-info btn btn-block" href="/swagger" target="_blank">Swagger dokumentáció megnyitása</a>
+                        <p class="mt-4"><small>Az adatok in memory db-ben tároljuk :-)</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card mt-5 shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Forráskód</h5>
+                        <hr />
+                        <pre>
+<code class="csharp">
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Holiday
+{
+    public class HolidayCalendar
+    {
+        private readonly List&#x3C;DateTime&#x3E; ExtraWorkDays;
+        private readonly List&#x3C;DateTime&#x3E; ExtraFreeDays;
+
+        public HolidayCalendar(List&#x3C;DateTime&#x3E; extraWorkDays, List&#x3C;DateTime&#x3E; extraFreeDays, List&#x3C;DateTime&#x3E; localHolidays)
+        {
+            ExtraWorkDays = extraWorkDays ?? new List&#x3C;DateTime&#x3E;();
+            ExtraFreeDays = extraFreeDays ?? new List&#x3C;DateTime&#x3E;();
+            LocalHolidays = localHolidays ?? LocalHolidays;
+        }
+
+        public DateTime PentecostSunday(int year) =&#x3E; EasterSunday(year).AddDays(49);
+        
+        public DateTime EasterSunday(int year)
+        {
+            int g = year % 19;
+            int c = year / 100;
+            int h = (c - c / 4 - (8 * c + 13) / 25 + 19 * g + 15) % 30;
+            int i = h - h / 28 * (1 - h / 28 * (29 / (h + 1)) * ((21 - g) / 11));
+            int day = i - (year + year / 4 + i + 2 - c + c / 4) % 7 + 28;
+            int month = 3;
+            if (day &#x3E; 31)
+            {
+                month++;
+                day -= 31;
+            }
+            return new DateTime(year, month, day);
+        }
+
+        public bool IsWorkDay(DateTime date)
+        {
+            return ExtraWorkDays.Contains(date) || (
+                    !ExtraFreeDays.Contains(date) &#x26;&#x26;
+                    date.DayOfWeek != DayOfWeek.Sunday
+                    &#x26;&#x26; date.DayOfWeek != DayOfWeek.Saturday
+                    &#x26;&#x26; LocalHolidays.Count(p =&#x3E; p.Year &#x3C;= date.Year &#x26;&#x26; p.Month == date.Month &#x26;&#x26; p.Day == date.Day) == 0
+                    &#x26;&#x26; EasterSunday(date.Year).AddDays(1) != date.Date
+                    &#x26;&#x26; PentecostSunday(date.Year).AddDays(1) != date.Date
+                    &#x26;&#x26; EasterSunday(date.Year).AddDays(-2) != date.Date
+                );
+        }
+
+        public DateTime AddWorkDays(DateTime date, int workDays)
+        {
+            var wd = Math.Abs(workDays);
+            while (wd &#x3E; 0)
+                wd -= IsWorkDay(date = date.Date.AddDays(Math.Sign(workDays))) ? 1 : 0;
+            return date;
+        }
+
+        public int WorkDaysBetween(DateTime date1, DateTime date2)
+        {
+          return Enumerable.Range(0, Math.Abs((date2.Date - date1.Date).Days))
+                           .Count(p =&#x3E; IsWorkDay(date1.Date.AddDays(p * Math.Sign((date2.Date - date1.Date).Days))));
+        }        
+    }
+}
+</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="hu-hu.js" type="text/javascript"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+        $(function () {
+            $('#date').datepicker({
+                showOtherMonths: true,
+                format: 'yyyy-mm-dd',
+                weekStartDay: 1,
+                locale: "hu-hu"
+            });
+            $('#date1').datepicker({
+                weekStartDay: 1,
+                showOtherMonths: true,
+                format: 'yyyy-mm-dd',
+                locale: "hu-hu"
+            });
+            $('#extraday').datepicker({
+                weekStartDay: 1,
+                showOtherMonths: true,
+                format: 'yyyy-mm-dd',
+                locale: "hu-hu"
+            });
+            $('#date2').datepicker({
+                weekStartDay: 1,
+                showOtherMonths: true,
+                format: 'yyyy-mm-dd',
+                locale: "hu-hu"
+            });
+            $("#b1").on("click", function () {
+                if ($("#workdays").val() && $("#date").val()) {
+                    $.get("/Holidays/AddWorkdDays/" + $("#date").val() + "/" + $("#workdays").val(),
+                        function (r) {
+                            var d = new Date(r.data);
+                            $("#result").html($("#date").val() + " + " + $("#workdays").val() + " munkanap = " + d.toLocaleDateString());
+                        }
+                    )
+                }
+            });
+            $("#b2").on("click", function () {
+                if ($("#date1").val() && $("#date2").val()) {
+                    $.get("/Holidays/WorkDaysBeetween/" + $("#date1").val() + "/" + $("#date2").val(),
+                        function (r) {
+                            $("#result2").html($("#date1").val() + " és " + $("#date2").val() + " között " + r.data.toString() + " munkanap van");
+                        }
+                    )
+                }
+            });
+            $("#b3").on("click", function () {
+                if ($("#extraday").val() && $("#dayType").val()!=="delete") {
+                    $.ajax({
+                        contentType: 'application/json',
+                        data: JSON.stringify({ date: $("#extraday").val(), dayType: $("#dayType").val() }),
+                        dataType: 'json',
+                        success: function (data) {
+                            Swal.fire({
+                                text: "Sikeres mentés",
+                                icon: "success"
+                            });
+                        },
+                        error: function () {
+                            Swal.fire({
+                                text: "Hiba történt",
+                                icon: "error"
+                            });
+                        },
+                        processData: false,
+                        type: 'POST',
+                        url: '/Holidays/setDay'
+                    });
+                }
+                if ($("#extraday").val() && $("#dayType").val()==="delete") {
+                    $.ajax({
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        success: function (data) {
+                            Swal.fire({
+                                text: "Sikeres törlés",
+                                icon: "success"
+                            });
+                        },
+                        error: function () {
+                            Swal.fire({
+                                text: "Hiba történt",
+                                icon: "error"
+                            });
+                        },
+                        processData: false,
+                        type: 'DELETE',
+                        url: '/Holidays/removeDay?date='+$("#extraday").val()
+                    });
+                }
+
+            });
+        });
+    </script>
+
+</body>
+</html>
